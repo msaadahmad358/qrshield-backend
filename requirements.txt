@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+pillow
+opencv-python-headless
+pyzbar
+scikit-learn
+joblib
+pandas
+requests
+tldextract
+dnspython
+torch
+torchvision
+python-multipart
+jinja2
