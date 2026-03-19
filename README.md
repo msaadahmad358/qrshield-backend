@@ -109,7 +109,34 @@ web: uvicorn main:app --host 0.0.0.0 --port $PORT
 
 ---
 
-## 🧪 Model Files
+## ⚠️ Troubleshooting (Common Issues)
+
+### 1. "Unable to find zbar shared library" (macOS)
+If you see this error, it means `pyzbar` cannot find the system library.
+1. Install `zbar` via brew: `brew install zbar`
+2. If it still fails (especially on M1/M2/M3 chips), try running uvicorn with the library path:
+   ```bash
+   export DYLD_LIBRARY_PATH="$(brew --prefix)/lib:$DYLD_LIBRARY_PATH"
+   ./venv/bin/uvicorn main:app --reload
+   ```
+
+### 2. Model files not found
+The app expects `.pth` and `.pkl` files in the root directory. This backend uses absolute path resolution relative to its location, so always run it from within the `qrshield-backend` directory or using the provided `venv`.
+
+---
+
+## 🧪 Tester App
+A simple Flutter application is included in the `tester_app/` directory. You can use it to test the backend directly from a mobile device (requires Flutter setup).
+
+To run it:
+```bash
+cd tester_app
+flutter run
+```
+
+---
+
+## 🧬 Model Files
 Ensure the following files are present in the root directory:
 - `best_qr_model.pth` (DL Model)
 - `qr_model.pkl` (ML Model)
