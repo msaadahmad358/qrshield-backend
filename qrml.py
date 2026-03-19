@@ -17,7 +17,7 @@ import os
 # ======================================
 # WHOIS API CONFIG
 # ======================================
-RAPIDAPI_KEY      = "48ae91a537mshe7a9870445933adp1ac93bjsne535f07ca743"
+RAPIDAPI_KEY      = os.getenv("RAPIDAPI_KEY", "48ae91a537mshe7a9870445933adp1ac93bjsne535f07ca743")
 RAPIDAPI_HOST     = "whois-lookup-api.p.rapidapi.com"
 RAPIDAPI_ENDPOINT = "https://whois-lookup-api.p.rapidapi.com/domains-age"
 

@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Pickled files
+*.pkl
+
+# Torch
+*.pth
+
+# OS
+.DS_Store
+
+# Debug folders
+qr_debug/
+temp_scan.png
+scan_*.png

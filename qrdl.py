@@ -6,7 +6,8 @@ from torchvision import models, transforms
 from PIL import Image
 
 
-MODEL_PATH = "best_qr_model.pth"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "best_qr_model.pth")
 THRESHOLD = 0.5845
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

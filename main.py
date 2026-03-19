@@ -30,11 +30,13 @@ import cv2
 import qrdl
 import qrml
 
-# ── App with root_path so docs/openapi work behind /mlapi proxy ──
+# root_path fallback can be configured via env for flexible hosting (e.g. Nginx at /mlapi)
+ROOT_PATH = os.getenv("ROOT_PATH", "/mlapi")
+
 app = FastAPI(
     title="QRShield API",
     version="1.0.0",
-    root_path="/mlapi",         # matches Nginx proxy prefix
+    root_path=ROOT_PATH,
 )
 
 # ── CORS: allow Flutter web + mobile ─────────────────────────────
@@ -46,7 +48,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-templates = Jinja2Templates(directory="templates")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 DEBUG     = False
 DEBUG_DIR = "qr_debug"
@@ -221,7 +224,9 @@ def analyze_qr(image: Image.Image) -> dict:
     }
     try:
         image     = image.convert("RGB")
-        temp_path = "temp_scan.png"
+        # Unique filename to avoid race conditions with multiple users
+        temp_name = f"scan_{int(time.time()*1000)}_{os.getpid()}.png"
+        temp_path = os.path.join(BASE_DIR, temp_name)
         image.save(temp_path, format="PNG")
 
         dl_label, dl_prob = qrdl.predict_image(dl_model, temp_path)
@@ -247,11 +252,20 @@ def analyze_qr(image: Image.Image) -> dict:
         else:
             result["fusion_score"] = round(float(dl_prob), 6)
             result["fusion_mode"]  = "DL Only (No URL)"
-            result["status"]       = "DISTORTED_QR" if dl_prob > 0 else "UNKNOWN"
+            # Use same threshold as qrdl internal or check label
+            result["status"]       = "DISTORTED_QR" if dl_label == "DISTORTED" else "BENIGN"
             result["note"]         = "No URL decoded; DL-only result."
 
     except Exception as e:
         result["error"] = str(e)
+
+    finally:
+        # Cleanup temp file
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except:
+                pass
 
     return result
 
